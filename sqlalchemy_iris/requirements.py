@@ -243,7 +243,11 @@ class Requirements(SuiteRequirements, AlembicRequirements):
     def get_isolation_levels(self, config):
         levels = set(config.db.dialect._isolation_lookup)
 
-        default = "READ UNCOMMITTED"
+        default = (
+            "READ COMMITTED"
+            if config.db.dialect.driver == "emb"
+            else "READ UNCOMMITTED"
+        )
         levels.add("AUTOCOMMIT")
 
         return {"default": default, "supported": levels}
@@ -944,7 +948,10 @@ class Requirements(SuiteRequirements, AlembicRequirements):
         """Target driver must support some degree of non-ascii symbol
         names.
         """
-        return exclusions.open()
+        return exclusions.skip_if(
+            lambda config: getattr(config.db.dialect, "embedded", False),
+            "embedded DBAPI crashes on non-ASCII result column names",
+        )
 
     @property
     def datetime_interval(self):
@@ -960,8 +967,13 @@ class Requirements(SuiteRequirements, AlembicRequirements):
         literal string, e.g. via the TypeEngine.literal_processor() method.
 
         """
-        # works stable only on Community driver
-        return self.community_driver
+        return exclusions.only_if(
+            lambda config: (
+                config.db.dialect.driver != "intersystems"
+                and not getattr(config.db.dialect, "embedded", False)
+            ),
+            "datetime literal rendering is not stable on this driver",
+        )
 
     @property
     def datetime(self):
@@ -1153,7 +1165,10 @@ class Requirements(SuiteRequirements, AlembicRequirements):
         a string.
         """
 
-        return exclusions.open()
+        return exclusions.skip_if(
+            lambda config: getattr(config.db.dialect, "embedded", False),
+            "embedded DBAPI returns untyped Decimal binds as strings",
+        )
 
     @property
     def numeric_received_as_decimal_untyped(self):
