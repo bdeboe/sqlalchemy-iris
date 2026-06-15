@@ -1,7 +1,19 @@
 sqlalchemy-iris
 ===
 
-An InterSystems IRIS dialect for SQLAlchemy.
+> [!WARNING]
+> This repository offers a community-driven project delivering an IRIS dialect for SQLAlchemy. Since this
+> project started, InterSystems has published its own [official
+> dialect](https://docs.intersystems.com/iris20261/csp/docbook/DocBook.UI.Page.cls?KEY=GPYDEV_sqlalchemy),
+> which is fully supported by [InterSystems Worldwide Response Center (WRC)](https://wrc.intersystems.com/).
+> You can install the official dialect using the following command:
+> ```
+> pip install sqlalchemy-intersystems-iris
+> ```
+> 
+> This repository is still available for reference, though for new projects you are recommended to consider
+> working with the official dialect.
+
 
 Pre-requisites
 ---
